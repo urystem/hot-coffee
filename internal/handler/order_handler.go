@@ -110,7 +110,7 @@ func (h *ordHandToService) DelOrdById(w http.ResponseWriter, r *http.Request) {
 			writeHttp(w, http.StatusInternalServerError, "order", err.Error())
 		}
 	} else {
-		slog.Info("Order deleted:", id)
+		slog.Info("Order ", "deleted:", id)
 		writeHttp(w, http.StatusNoContent, "", "")
 	}
 }
@@ -120,7 +120,7 @@ func (h *ordHandToService) PostOrdCloseById(w http.ResponseWriter, r *http.Reque
 		slog.Warn("Invalid id for get order")
 		writeHttp(w, http.StatusBadRequest, "Invalid id", "Check the order id")
 	} else if err := h.orderService.PostServiseOrdCloseById(id); err != nil {
-		slog.Error("Close order error id:", id)
+		slog.Error("Close order", "error id:", id)
 		if err == models.ErrNotFound {
 			writeHttp(w, http.StatusNotFound, "order", err.Error())
 		} else if err == models.ErrOrdStatusClosed {
@@ -129,7 +129,7 @@ func (h *ordHandToService) PostOrdCloseById(w http.ResponseWriter, r *http.Reque
 			writeHttp(w, http.StatusInternalServerError, "close order", err.Error())
 		}
 	} else {
-		slog.Info("order closed, id: ", id)
+		slog.Info("order closed", "id: ", id)
 		writeHttp(w, http.StatusOK, "order", "closed")
 	}
 }
@@ -139,7 +139,7 @@ func (h *ordHandToService) TotalSales(w http.ResponseWriter, r *http.Request) {
 		slog.Error("Get total sales", "error", err)
 		writeHttp(w, http.StatusInternalServerError, "failed to get total sales:", err.Error())
 	} else {
-		slog.Info("Get total sales:", total)
+		slog.Info("Succes", "Get total sales:", total)
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(map[string]float64{"total_sales": total})
 	}
@@ -147,7 +147,7 @@ func (h *ordHandToService) TotalSales(w http.ResponseWriter, r *http.Request) {
 
 func (h *ordHandToService) PopularItem(w http.ResponseWriter, r *http.Request) {
 	if sortedItems, err := h.orderService.GetServicePopularItem(); err != nil {
-		slog.Error("get popular items list error:", err)
+		slog.Error("Error", "get popular items list:", err)
 		writeHttp(w, http.StatusInternalServerError, "get popular items", err.Error())
 	} else if err = bodyJsonStruct(w, sortedItems); err != nil {
 		slog.Error("Error write sorted items to body")

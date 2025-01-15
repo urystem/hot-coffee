@@ -75,7 +75,7 @@ func (h *menuHaldToService) GetMenuById(w http.ResponseWriter, r *http.Request) 
 func (h *menuHaldToService) PutMenuById(w http.ResponseWriter, r *http.Request) {
 	var menuStruct models.MenuItem
 	if id := r.PathValue("id"); checkName(id) {
-		slog.Error("Put Menu by id", "Invalid id")
+		slog.Error("Put Menu by id", "Invalid id ", id)
 		writeHttp(w, http.StatusBadRequest, "id", "invalid")
 	} else if r.Header.Get("Content-Type") != "application/json" {
 		slog.Error("Put the menu: content_Type must be application/json")
@@ -96,7 +96,7 @@ func (h *menuHaldToService) PutMenuById(w http.ResponseWriter, r *http.Request) 
 			writeHttp(w, http.StatusInternalServerError, "error post menu", err.Error())
 		}
 	} else {
-		slog.Info("Updated Menu by id: ", id)
+		slog.Info("Menu: ", "Updated Menu by id: ", id)
 		writeHttp(w, http.StatusOK, "Updated Menu by id: ", id)
 	}
 }
@@ -114,7 +114,7 @@ func (h *menuHaldToService) DelMenuById(w http.ResponseWriter, r *http.Request) 
 			writeHttp(w, http.StatusInternalServerError, "delete menu", err.Error())
 		}
 	} else {
-		slog.Info("Deleted menu by id :", idname)
+		slog.Info("Deleted: ", " menu by id :", idname)
 		writeHttp(w, http.StatusNoContent, "", "")
 	}
 }

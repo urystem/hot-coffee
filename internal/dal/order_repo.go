@@ -25,6 +25,7 @@ func (h *orderDalStruct) ReadOrdersDal() ([]models.Order, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer file.Close()
 	var orders []models.Order
 	if err = json.NewDecoder(file).Decode(&orders); err != nil {
 		return nil, err

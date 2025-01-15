@@ -56,9 +56,7 @@ Options:
 	} else {
 		os.Stdout.WriteString("Dir: " + *dir + "\nPort: " + *port + "\n")
 		slog.Info("Listen and Serve starting")
-		if err = http.ListenAndServe(":"+*port, router.Allrouter(dir)); err != nil {
-			slog.Error("Server stoped", "error", err)
-		}
+		slog.Error("Server stoped", "error", http.ListenAndServe(":"+*port, router.Allrouter(dir)))
 	}
 	os.Exit(1)
 }

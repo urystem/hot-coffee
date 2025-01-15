@@ -36,6 +36,7 @@ func (md *menuDalStruct) ReadMenuDal() ([]models.MenuItem, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer file.Close()
 	var menuItems []models.MenuItem
 	if err = json.NewDecoder(file).Decode(&menuItems); err != nil {
 		return nil, err
