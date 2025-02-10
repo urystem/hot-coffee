@@ -22,7 +22,10 @@ func ReturnOrdHaldStruct(ordSerInt service.OrdServiceInter) *ordHandToService {
 
 func (h *ordHandToService) PostOrder(w http.ResponseWriter, r *http.Request) {
 	var orderStruct models.Order
-	if err := json.NewDecoder(r.Body).Decode(&orderStruct); err != nil {
+	if r.Header.Get("Content-Type") != "application/json" {
+		slog.Error("post the menu: content_Type must be application/json")
+		writeHttp(w, http.StatusBadRequest, "content/type", "not json")
+	} else if err := json.NewDecoder(r.Body).Decode(&orderStruct); err != nil {
 		slog.Error("incorrect input to post order", "error", err)
 		writeHttp(w, http.StatusBadRequest, "input json", err.Error())
 	} else if err = checkOrdStruct(&orderStruct); err != nil {
@@ -73,6 +76,9 @@ func (h *ordHandToService) PutOrdById(w http.ResponseWriter, r *http.Request) {
 	if id := r.PathValue("id"); checkOdrId(id) {
 		slog.Warn("Invalid id for put a order")
 		writeHttp(w, http.StatusBadRequest, "put order", "invalid id")
+	} else if r.Header.Get("Content-Type") != "application/json" {
+		slog.Error("post the menu: content_Type must be application/json")
+		writeHttp(w, http.StatusBadRequest, "content/type", "not json")
 	} else if err := json.NewDecoder(r.Body).Decode(&orderStruct); err != nil {
 		slog.Error("incorrect input to put a order", "error", err)
 		writeHttp(w, http.StatusBadRequest, "input json", err.Error())

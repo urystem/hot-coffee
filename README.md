@@ -3,10 +3,10 @@
 
 
 ### Welcome to the Hot Coffee project — where hot ideas come to life!
-#### **Using Postman:** Send a request to `http://localhost:8087`.
+#### **Using Postman:** Send a request to `http://localhost:8080`.
 #### Clone the repository:
    ```bash
-   git clone git@git.platform.alem.school:aideyato/hot-coffee.git
+   git clone git@git.platform.alem.school:ukabdoll/hot-coffee.git
 ```
 
 ## About Hot-Coffee

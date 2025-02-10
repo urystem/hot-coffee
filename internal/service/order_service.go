@@ -117,8 +117,7 @@ func (ser *ordServiceToDal) DelServiceOrdById(id string) error {
 					return err
 				}
 			}
-			ords = append(ords[:i], ords[i+1:]...)
-			return ser.ordDalInt.WriteOrderDal(ords)
+			return ser.ordDalInt.WriteOrderDal(append(ords[:i], ords[i+1:]...))
 		}
 	}
 	return models.ErrNotFound
@@ -152,8 +151,7 @@ func (ser *ordServiceToDal) GetServiseTotalSales() (float64, error) {
 	}
 	var ansTotal float64
 	for _, menu := range menus {
-		quanti, exists := totalMenus[menu.ID]
-		if exists {
+		if quanti, exists := totalMenus[menu.ID]; exists {
 			ansTotal += float64(quanti) * menu.Price
 		}
 	}
@@ -185,7 +183,6 @@ func (ser *ordServiceToDal) returnMapSelled(isPopular bool) (map[string]int, err
 		return nil, err
 	}
 	totalMenus := make(map[string]int)
-
 	for _, order := range orders {
 		if isPopular || order.Status != "open" {
 			for _, item := range order.Items {
@@ -229,8 +226,8 @@ func (ser *ordServiceToDal) updateInventory(menuesOrd []models.OrderItem, minus 
 	var notEnough []string
 	for _, v := range menuesOrd {
 		invents := ser.returnMenu(menus, v.ProductID) // search in menu and return her invents
-		if invents == nil {
-			return nil, errors.New("Unknown error")
+		if invents == nil {                           // this menu is not found in menues
+			return nil, errors.New("after checking not found menu") // ---FATAL ERROR
 		}
 		for _, invent := range invents { // in needed invents
 			invent.Quantity *= float64(v.Quantity)
@@ -251,19 +248,19 @@ func (ser *ordServiceToDal) returnMenu(menus []models.MenuItem, menuId string) [
 			return v.Ingredients
 		}
 	}
-	return nil
+	return nil // it is impossible, because it is checked before and it is must be in here
 }
 
 func (ser *ordServiceToDal) changeCountInventsTempBase(invertory []models.InventoryItem, nameInvent string, quanti float64, minus bool) error {
 	for i, v := range invertory {
 		if v.IngredientID == nameInvent {
 			if minus {
-				invertory[i].Quantity -= quanti
+				invertory[i].Quantity -= quanti // алып тастаймыз минусқа кетсе де, үйткені кейбірі минусқа кетпеуі мүмкін, сосын тек минусқа кеткендерін терңп жүрмеу үшін - бәрі біріңғай алынған дұрыс. Кейін бәрін біріңғай қайтара салуға оңай болады
+				if invertory[i].Quantity < 0 {
+					return errors.New(v.IngredientID + ": Required " + strconv.FormatFloat(quanti, 'f', 2, 64) + " Available: " + strconv.FormatFloat(invertory[i].Quantity+quanti, 'f', 2, 64))
+				}
 			} else {
 				invertory[i].Quantity += quanti
-			}
-			if invertory[i].Quantity < 0 {
-				return errors.New(v.IngredientID + ": Required " + strconv.FormatFloat(quanti, 'f', 2, 64) + " Available: " + strconv.FormatFloat(invertory[i].Quantity+quanti, 'f', 2, 64))
 			}
 		}
 	}

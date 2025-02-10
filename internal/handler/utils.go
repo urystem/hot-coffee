@@ -6,14 +6,14 @@ import (
 	"regexp"
 )
 
-func writeHttp(w http.ResponseWriter, code int, where, errOrMes string) {
-	w.Header().Set("Content-Type", "application/json")
+func writeHttp(w http.ResponseWriter, code int, where, errOrMes string) error {
 	key := "error"
 	if code < 300 {
 		key = "message"
 	}
 	w.WriteHeader(code)
-	json.NewEncoder(w).Encode(map[string]string{key: where + " : " + errOrMes})
+	w.Header().Set("Content-Type", "application/json")
+	return json.NewEncoder(w).Encode(map[string]string{key: where + " : " + errOrMes})
 }
 
 func bodyJsonStruct(w http.ResponseWriter, someThing any) error {

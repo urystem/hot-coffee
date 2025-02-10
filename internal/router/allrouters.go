@@ -8,11 +8,13 @@ import (
 	"hot-coffee/internal/service"
 )
 
+var PathFiles [3]string = [3]string{"/orders.json", "/menu_items.json", "/inventory.json"}
+
 func Allrouter(dir *string) *http.ServeMux {
 	mux := http.NewServeMux()
 
 	// setup pathfile to dulinvent and build to handfunc
-	var dalInventInter dal.InventoryDataAccess = dal.NewInventoryRepository(*dir + "/inventory.json")
+	var dalInventInter dal.InventoryDataAccess = dal.NewInventoryRepository(*dir + PathFiles[2])
 	var serviceInventInter service.InventoryService = service.NewInventoryService(dalInventInter)
 	handInv := handler.NewInventoryHandler(serviceInventInter)
 	mux.HandleFunc("POST /inventory", handInv.CreateInventory)
@@ -23,7 +25,7 @@ func Allrouter(dir *string) *http.ServeMux {
 	mux.HandleFunc("PUT /inventory", handInv.PutAllIng)
 
 	// setup pathfile to dulmenu struct and build to handfunc
-	var dalMenuInter dal.MenuDalInter = dal.ReturnMenuDalStruct(*dir + "/menu_items.json")
+	var dalMenuInter dal.MenuDalInter = dal.ReturnMenuDalStruct(*dir + PathFiles[1])
 	var menuSer service.MenuServiceInter = service.ReturnMenuSerStruct(dalMenuInter, dalInventInter)
 	menuHand := handler.ReturnMenuHaldStruct(menuSer)
 	mux.HandleFunc("POST /menu", menuHand.PostMenu)
@@ -33,7 +35,7 @@ func Allrouter(dir *string) *http.ServeMux {
 	mux.HandleFunc("DELETE /menu/{id}", menuHand.DelMenuById)
 
 	// setup pathfiles to dulorder struct and build to handlfunc
-	var dalOrdInter dal.OrderDalInter = dal.ReturnOrdDalStruct(*dir + "/orders.json")
+	var dalOrdInter dal.OrderDalInter = dal.ReturnOrdDalStruct(*dir + PathFiles[0])
 	var ordSer service.OrdServiceInter = service.ReturnOrdSerStruct(dalOrdInter, dalMenuInter, dalInventInter)
 	ordHand := handler.ReturnOrdHaldStruct(ordSer)
 	mux.HandleFunc("POST /orders", ordHand.PostOrder)
